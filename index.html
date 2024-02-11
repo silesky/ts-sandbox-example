@@ -169,8 +169,14 @@ const triggerFn = (signal: Signals) => {
         })
         tsProxy.getEmitOutput(model.uri.toString())
           .then((r) => {
-            document.getElementById('compiled-code').innerText = r.outputFiles[0].text
+            // log compiled code
             console.log('compiled', r.outputFiles[0].text);
+            // show compiled code in html
+            const codeBlock = document.getElementById('compiled-code')
+            if (codeBlock) {
+              codeBlock.innerText = r.outputFiles[0].text
+            }
+
           });
       })
 
@@ -181,7 +187,10 @@ const triggerFn = (signal: Signals) => {
 
   document.body.appendChild(getLoaderScript)
 
-  const element = document.createElement('pre')
-  element.setAttribute('id', 'compiled-code')
-  document.body.appendChild(element)
+  // {
+  //   // create compiled code
+  //   const element = document.createElement('pre')
+  //   element.setAttribute('id', 'compiled-code')
+  //   document.body.appendChild(element)
+  // }
 </script>
