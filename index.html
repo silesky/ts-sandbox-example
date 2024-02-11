@@ -152,18 +152,18 @@ const triggerFn = (signal: Signals) => {
       const sandbox = sandboxFactory.createTypeScriptSandbox(sandboxConfig, main, window.ts)
       const editor = sandbox.editor
 
-      var let
+      var tsProxy
       monaco.languages.typescript.getTypeScriptWorker()
         .then((worker) => {
           worker(sandbox.getModel().uri)
             .then((proxy) => {
-              let = proxy;
+              tsProxy = proxy;
             });
         });
 
 
       sandbox.getModel().onDidChangeContent(() => {
-        let.getEmitOutput(sandbox.getModel().uri.toString())
+        tsProxy.getEmitOutput(sandbox.getModel().uri.toString())
           .then((r) => { console.log('compiled', r.outputFiles[0].text); });
       })
 
