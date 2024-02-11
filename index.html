@@ -42,15 +42,42 @@
     ) => {
       console.log(main)
       const initialCode =
-        `const triggerFn = (signal: Signals) => {
-        if (signal.type === SignalType.Navigation) {
-            signal.data.url // can safely access WebNavigationData here
+        `
+const triggerFn = (signal: Signals) => {
+  if (signal.type === 'Navigation') {
+      signal.data.url // can safely access WebNavigationData here
 
-        } else if (signal.type === SignalType.UIInteraction) {
-            signal.data.control  // can safely access WebContralData here
+  } else if (signal.type === 'UIInteraction') {
+      signal.data.control  // can safely access WebContralData here
 
-        }
-    }
+  }
+}
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -71,13 +98,8 @@
     
     
 
-    enum SignalType {
-        UIInteraction,
-        Navigation,
-        Network,
-        Instrumentation,
-        UserDefined
-    }
+
+    type SignalType = 'UIInteraction' | 'Navigation' | 'Network' | 'Instrumentation' | 'UserDefined'
 
     interface RawSignal<T> {
         anonymousId: string
@@ -97,11 +119,11 @@
     }
 
     interface WebNavigationSignal extends RawSignal<WebNavigationData> {
-        type: SignalType.Navigation
+        type: 'Navigation'
     }
 
     interface UIInteractionSignal extends RawSignal<WebContralData> {
-        type: SignalType.UIInteraction
+        type: 'UIInteraction'
     }
 
     type Signals = WebNavigationSignal | UIInteractionSignal
@@ -113,23 +135,39 @@
 
         document.getElementById('loader').parentNode.removeChild(document.getElementById('loader'))
 
+
+
       } else {
         console.error('Could not get all the dependencies of sandbox set up!')
         console.error('main', !!main, 'ts', !!window.ts, 'sandbox', !!sandbox)
         return
       }
 
-      // Create a sandbox and embed it into the div #monaco-editor-embed
+
       const sandboxConfig = {
         text: initialCode,
         domID: 'monaco-editor-embed',
       }
 
       const sandbox = sandboxFactory.createTypeScriptSandbox(sandboxConfig, main, window.ts)
+      const editor = sandbox.editor
+
+      var let
+      monaco.languages.typescript.getTypeScriptWorker()
+        .then((worker) => {
+          worker(sandbox.getModel().uri)
+            .then((proxy) => {
+              let = proxy;
+            });
+        });
 
 
+      sandbox.getModel().onDidChangeContent(() => {
+        let.getEmitOutput(sandbox.getModel().uri.toString())
+          .then((r) => { console.log('compiled', r.outputFiles[0].text); });
+      })
 
-      sandbox.editor.focus()
+      editor.focus()
     })
   }
 
