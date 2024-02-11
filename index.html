@@ -7,10 +7,26 @@
   <link href="
   https://cdn.jsdelivr.net/npm/getskeleton@2.0.4-2/lib/css/skeleton.min.css
   " rel="stylesheet">
+  <link href="index.css" rel="stylesheet">
 </head>
 <div id="loader">Loading...</div>
 <h2>Trigger Function Editor</h2>
-<div id="monaco-editor-embed" style="height: 500px;" />
+
+<body>
+  <main>
+    <div>
+      <h3>Signal Buffer</h3>
+    </div>
+    <div>
+      <h3>Editor</h3>
+      <div id="monaco-editor-embed" style="height: 500px;"></div>
+      <button>Run</button>
+    </div>
+    <div>
+      <h3>Events</h3>
+    </div>
+  </main>
+</body>
 <script>
   // First set up the VSCode loader in a script tag
   const getLoaderScript = document.createElement('script')
@@ -44,10 +60,11 @@
         `const triggerFn: TriggerFn = (signal) => {
   if (signal.type === 'Navigation') {
       signal.data.url // can safely access WebNavigationData here
-
-  } else if (signal.type === 'UIInteraction') {
+    } else if (signal.type === 'UIInteraction') {
       signal.data.control  // can safely access WebContralData here
-  }
+    }
+    
+    analytics.page(undefined, undefined, { some_data: 'foo' })
 }
     
     
@@ -140,8 +157,12 @@
       (signal: Signals, ctx: SignalCtx): void
     }
     
-   import { AnalyticsSnippet } from "@segment/analytics-next"
-   declare const analytics: AnalyticsSnippet
+    interface Analytics {
+      track(...args: any[]): void
+      page(...args: any[]): void
+    }
+
+   declare const analytics: Analytics
 `
 
       const isOK = main && window.ts && sandboxFactory

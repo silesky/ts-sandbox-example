@@ -1,0 +1,9 @@
+main {
+  display: grid;
+  grid-auto-rows: 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+button {
+  margin: 5px;
+}
