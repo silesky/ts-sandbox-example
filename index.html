@@ -41,14 +41,12 @@
       sandboxFactory
     ) => {
       const initialCode =
-        `
-const triggerFn = (signal: Signals) => {
+        `const triggerFn: TriggerFn = (signal) => {
   if (signal.type === 'Navigation') {
       signal.data.url // can safely access WebNavigationData here
 
   } else if (signal.type === 'UIInteraction') {
       signal.data.control  // can safely access WebContralData here
-
   }
 }
     
@@ -124,9 +122,26 @@ const triggerFn = (signal: Signals) => {
     interface UIInteractionSignal extends RawSignal<WebContralData> {
         type: 'UIInteraction'
     }
+    
+    
 
     type Signals = WebNavigationSignal | UIInteractionSignal
+  
+    interface SegmentEvent {
+      type: string
+    }
 
+    interface SignalCtx {
+      find(fromSignal: RawSignal<any>| undefined, signalType: SignalType, predicate: (s:RawSignal<any>) => boolean): RawSignal<any>| undefined
+      add(signal:RawSignal<any>): void
+    }
+    
+    interface TriggerFn {
+      (signal: Signals, ctx: SignalCtx): void
+    }
+    
+   import { AnalyticsSnippet } from "@segment/analytics-next"
+   declare const analytics: AnalyticsSnippet
 `
 
       const isOK = main && window.ts && sandboxFactory
