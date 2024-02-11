@@ -8,6 +8,13 @@
   https://cdn.jsdelivr.net/npm/getskeleton@2.0.4-2/lib/css/skeleton.min.css
   " rel="stylesheet">
   <link href="index.css" rel="stylesheet">
+  <script src="
+  https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js
+  "></script>
+  <link href="
+  https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css
+  " rel="stylesheet">
+
 </head>
 <div id="loader">Loading...</div>
 <h2>Trigger Function Editor</h2>
@@ -16,18 +23,34 @@
   <main>
     <div>
       <h3>Signal Buffer</h3>
+      <pre>
+        <code id="test-signals" class="language-js">
+        </code>
+      </pre>
     </div>
     <div>
       <h3>Editor</h3>
       <div id="monaco-editor-embed" style="height: 500px;"></div>
-      <button>Run</button>
+      <button id="test-btn">Test</button>
     </div>
     <div>
       <h3>Events</h3>
+      <div id="results"></div>
+    </div>
     </div>
   </main>
 </body>
 <script>
+  const range = (end) => {
+    const result = []
+    for (let i = 1; i <= end; i++) {
+      result.push(i)
+    }
+    return result
+  }
+
+  var tsProxy, model, sandbox
+
   // First set up the VSCode loader in a script tag
   const getLoaderScript = document.createElement('script')
   getLoaderScript.src = 'https://www.typescriptlang.org/js/vs.loader.js'
@@ -64,55 +87,9 @@
       signal.data.control  // can safely access WebContralData here
     }
     
-    analytics.page(undefined, undefined, { some_data: 'foo' })
-}
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
+    // examples
+    analytics.track('foo')
+}` + range(50).map(_ => `\n`).join('') + `
     type SignalType = 'UIInteraction' | 'Navigation' | 'Network' | 'Instrumentation' | 'UserDefined'
 
     interface RawSignal<T> {
@@ -161,8 +138,10 @@
       track(...args: any[]): void
       page(...args: any[]): void
     }
-
-   declare const analytics: Analytics
+    declare const analytics: Analytics
+    
+    globalThis.triggerFn = triggerFn
+    
 `
 
       const isOK = main && window.ts && sandboxFactory
@@ -184,11 +163,10 @@
         domID: 'monaco-editor-embed',
       }
 
-      const sandbox = sandboxFactory.createTypeScriptSandbox(sandboxConfig, main, window.ts)
-      const editor = sandbox.editor
-      const model = sandbox.getModel()
+      sandbox = sandboxFactory.createTypeScriptSandbox(sandboxConfig, main, window.ts)
+      editor = sandbox.editor
+      model = sandbox.getModel()
 
-      var tsProxy
       monaco.languages.typescript.getTypeScriptWorker()
         .then((worker) => {
           worker(model.uri)
@@ -205,14 +183,7 @@
         })
         tsProxy.getEmitOutput(model.uri.toString())
           .then((r) => {
-            // log compiled code
             console.log('compiled', r.outputFiles[0].text);
-            // show compiled code in html
-            const codeBlock = document.getElementById('compiled-code')
-            if (codeBlock) {
-              codeBlock.innerText = r.outputFiles[0].text
-            }
-
           });
       })
 
@@ -223,10 +194,5 @@
 
   document.body.appendChild(getLoaderScript)
 
-  // {
-  //   // create compiled code
-  //   const element = document.createElement('pre')
-  //   element.setAttribute('id', 'compiled-code')
-  //   document.body.appendChild(element)
-  // }
 </script>
+<script src="index.js"></script>
