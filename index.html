@@ -168,7 +168,10 @@ const triggerFn = (signal: Signals) => {
           })
         })
         tsProxy.getEmitOutput(model.uri.toString())
-          .then((r) => { console.log('compiled', r.outputFiles[0].text); });
+          .then((r) => {
+            document.getElementById('compiled-code').innerText = r.outputFiles[0].text
+            console.log('compiled', r.outputFiles[0].text);
+          });
       })
 
 
@@ -177,4 +180,8 @@ const triggerFn = (signal: Signals) => {
   }
 
   document.body.appendChild(getLoaderScript)
+
+  const element = document.createElement('pre')
+  element.setAttribute('id', 'compiled-code')
+  document.body.appendChild(element)
 </script>
