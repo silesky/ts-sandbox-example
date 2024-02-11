@@ -40,7 +40,6 @@
       _tsWorker,
       sandboxFactory
     ) => {
-      console.log(main)
       const initialCode =
         `
 const triggerFn = (signal: Signals) => {
@@ -151,21 +150,27 @@ const triggerFn = (signal: Signals) => {
 
       const sandbox = sandboxFactory.createTypeScriptSandbox(sandboxConfig, main, window.ts)
       const editor = sandbox.editor
+      const model = sandbox.getModel()
 
       var tsProxy
       monaco.languages.typescript.getTypeScriptWorker()
         .then((worker) => {
-          worker(sandbox.getModel().uri)
+          worker(model.uri)
             .then((proxy) => {
               tsProxy = proxy;
             });
         });
 
-
-      sandbox.getModel().onDidChangeContent(() => {
-        tsProxy.getEmitOutput(sandbox.getModel().uri.toString())
+      model.onDidChangeContent(() => {
+        tsProxy.getSemanticDiagnostics(model.uri.toString()).then(diagnostics => {
+          diagnostics.forEach(diag => {
+            console.warn('TS Error:', diag.messageText);
+          })
+        })
+        tsProxy.getEmitOutput(model.uri.toString())
           .then((r) => { console.log('compiled', r.outputFiles[0].text); });
       })
+
 
       editor.focus()
     })
