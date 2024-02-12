@@ -84,11 +84,8 @@
   if (signal.type === 'Navigation') {
       signal.data.url // can safely access WebNavigationData here
     } else if (signal.type === 'UIInteraction') {
-      signal.data.control  // can safely access WebContralData here
+      analytics.track(signal.data.control + ' ' + signal.data.info)
     }
-    
-    // examples
-    analytics.track('foo')
 }` + range(50).map(_ => `\n`).join('') + `
     type SignalType = 'UIInteraction' | 'Navigation' | 'Network' | 'Instrumentation' | 'UserDefined'
 
