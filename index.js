@@ -4,7 +4,7 @@ const signals = [
   //   type: "UIInteractionSignal",
   //   data: {
   //     control: "Button",
-  //     info: "foo"
+  //     info: "click"
   //   },
   // },
   {
@@ -26,7 +26,7 @@ document.getElementById("test-signals").innerHTML = JSON.stringify(
 var eventStack = []
 var analytics = {
   track: function () {
-    eventStack.push(['analytics.track()', `event: ${arguments[0]}`].join(' | '))
+    eventStack.push(['analytics.track()', `name: ${arguments[0]}`, arguments[1] && `properties: ${JSON.stringify(arguments[1])}`].join(' | '))
   },
   page: function () {
     eventStack.push(['page()'])
