@@ -26,23 +26,32 @@ document.getElementById("test-signals").innerHTML = JSON.stringify(
 
 var eventStack = []
 
-const trackArgsToObject = (arguments) => {
+const pickBy = (obj, expr) => Object.keys(obj).reduce((acc, key) => {
+  if (expr(key, obj[key])) {
+    acc[key] = obj[key]
+  }
+  return acc
+}, {})
+
+const prettifyTrack = (arguments) => {
   if (!Array.isArray(arguments)) {
     arguments = Array.from(arguments)
   }
-  return Object.keys({
-    name: arguments[0]
-    properties: JSON.stringify(arguments[1])
-  }).reduce(k => ({
-    const v = acc[k]
-   if(v) {
-      acc[k] = v
-    }
-  }, {}))
+
+  const obj = {
+    name: arguments[0],
+    properties: arguments[1]
+  }
+
+  const normalized = pickBy(obj, (key, val) => {
+    return Boolean(val)
+  })
+  return JSON.stringify(normalized, undefined, 2)
 }
+
 var analytics = {
   track: function () {
-    eventStack.push(['analytics.track()', `name: ${arguments[0]}`, arguments[1] && `properties: ${JSON.stringify(arguments[1])}`].join(' | '))
+    eventStack.push(['analytics.track()', prettifyTrack(arguments)])
   },
   page: function () {
     eventStack.push(['page()'])
@@ -61,7 +70,7 @@ document.getElementById('test-btn').addEventListener('click', () => {
       eval(r.outputFiles[0].text)
       triggerFn(currentSignal)
       console.log(eventStack)
-      document.getElementById('results').innerHTML = eventStack.map(el => `<li>${el}</li>`).join('\n')
+      document.getElementById('results').innerHTML = eventStack.map(el => `<li>${el.join(', ')}</li>`).join('\n')
     });
 })
 
