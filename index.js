@@ -23,13 +23,13 @@ document.getElementById("test-signals").innerHTML = JSON.stringify(
   2
 );
 
-var eventBuffer = []
+var eventStack = []
 var analytics = {
   track: function () {
-    eventBuffer.push(['analytics.track()', `event: ${arguments[0]}`].join(' | '))
+    eventStack.push(['analytics.track()', `event: ${arguments[0]}`].join(' | '))
   },
   page: function () {
-    eventBuffer.push(['page()'])
+    eventStack.push(['page()'])
   },
 }
 
@@ -37,15 +37,15 @@ var analytics = {
 const currentSignal = signals[0] // TODO
 
 document.getElementById('test-btn').addEventListener('click', () => {
-  eventBuffer = []
+  eventStack = []
   tsProxy.getEmitOutput(model.uri.toString())
     .then((r) => {
       // show compiled code in html
       console.log(r.outputFiles[0].text)
       eval(r.outputFiles[0].text)
       triggerFn(currentSignal)
-      console.log(eventBuffer)
-      document.getElementById('results').innerHTML = eventBuffer.map(el => `<li>${el}</li>`).join('\n')
+      console.log(eventStack)
+      document.getElementById('results').innerHTML = eventStack.map(el => `<li>${el}</li>`).join('\n')
     });
 })
 
