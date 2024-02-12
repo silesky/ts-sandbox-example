@@ -1,12 +1,13 @@
 const signals = [
-  // {
-  //   anonymousId: "foo",
-  //   type: "UIInteractionSignal",
-  //   data: {
-  //     control: "Button",
-  //     info: "click"
-  //   },
-  // },
+  {
+    anonymousId: "abc123",
+    type: "UIInteraction",
+    data: {
+      control: "Button",
+      info: "click",
+      label: "Checkout"
+    },
+  },
   {
     anonymousId: "abc123",
     type: "Navigation",
@@ -24,6 +25,21 @@ document.getElementById("test-signals").innerHTML = JSON.stringify(
 );
 
 var eventStack = []
+
+const trackArgsToObject = (arguments) => {
+  if (!Array.isArray(arguments)) {
+    arguments = Array.from(arguments)
+  }
+  return Object.keys({
+    name: arguments[0]
+    properties: JSON.stringify(arguments[1])
+  }).reduce(k => ({
+    const v = acc[k]
+   if(v) {
+      acc[k] = v
+    }
+  }, {}))
+}
 var analytics = {
   track: function () {
     eventStack.push(['analytics.track()', `name: ${arguments[0]}`, arguments[1] && `properties: ${JSON.stringify(arguments[1])}`].join(' | '))
